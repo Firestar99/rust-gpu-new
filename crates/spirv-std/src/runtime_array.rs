@@ -60,4 +60,32 @@ impl<T> RuntimeArray<T> {
         }
         result_slot.assume_init()
     }
+
+    /// Index the array, allowing non-uniform access on a *wave* level. This is the equivalent to
+    /// GLSL's [`nonuniformEXT`](https://github.com/KhronosGroup/GLSL/blob/master/extensions/ext/GL_EXT_nonuniform_qualifier.txt) used on array indices.
+    /// Unfortunately, because the length of the runtime array cannot be known,
+    /// this function will happily index outside of the bounds of the array, and so is unsafe.
+    ///
+    /// # Safety
+    /// Bounds checking is not performed, and indexing outside the bounds of the array can happen,
+    /// and lead to UB.
+    #[spirv_std_macros::gpu_only]
+    pub unsafe fn index_nonuniform(&self, index: usize) -> &T {
+        // FIXME(eddyb) `let mut result = T::default()` uses (for `asm!`), with this.
+        // NOTE(siebencorgie): From what I understand we need to decorate the `index`, the `arr` as well as `result` and `result_slot` nonuniform.
+        let mut result_slot = core::mem::MaybeUninit::uninit();
+        asm! {
+            "OpDecorate {index} NonUniform",
+            "OpDecorate {arr} NonUniform",
+            "OpDecorate %result NonUniform",
+            "OpDecorate {result_slot} NonUniform",
+
+            "%result = OpAccessChain _ {arr} {index}",
+            "OpStore {result_slot} %result",
+            arr = in(reg) self,
+            index = in(reg) index,
+            result_slot = in(reg) result_slot.as_mut_ptr(),
+        }
+        result_slot.assume_init()
+    }
 }
