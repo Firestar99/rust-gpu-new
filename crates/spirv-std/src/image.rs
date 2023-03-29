@@ -18,13 +18,13 @@ pub use spirv_std_types::image_params::{
 
 use sample_with::{NoneTy, SampleParams, SomeTy};
 
-use crate::{float::Float, integer::Integer, vector::Vector, Sampler};
+use crate::{Sampler, float::Float, integer::Integer, vector::Vector};
 
 /// Re-export of primitive types to ensure the `Image` proc macro always points
 /// to the right type.
 #[doc(hidden)]
 pub mod __private {
-    pub use {f32, f64, i16, i32, i64, i8, u16, u32, u64, u8};
+    pub use {f32, f64, i8, i16, i32, i64, u8, u16, u32, u64};
 }
 
 /// A 1d image used with a sampler.
@@ -243,6 +243,37 @@ impl<
                 in(reg) &coord
             );
             result.truncate_into()
+        }
+    }
+
+    /// Sample texels at `coord` from the image using `sampler`. Same as [Image::sample], but assumes that the image
+    /// (`self`) is nonuniformly accessed through a `RuntimeArray`.
+    #[crate::macros::gpu_only]
+    pub fn sample_nonuniform<F>(
+        &self,
+        sampler: Sampler,
+        coord: impl ImageCoordinate<F, DIM, ARRAYED>,
+    ) -> SampledType::Vec4
+    where
+        F: Float,
+    {
+        unsafe {
+            let mut result = Default::default();
+            asm!(
+                "%typeSampledImage = OpTypeSampledImage typeof*{1}",
+                "OpDecorate %image NonUniform",
+                "%image = OpLoad typeof*{1} {1}",
+                "%sampler = OpLoad typeof*{2} {2}",
+                "%coord = OpLoad typeof*{3} {3}",
+                "%sampledImage = OpSampledImage %typeSampledImage %image %sampler",
+                "%result = OpImageSampleImplicitLod typeof*{0} %sampledImage %coord",
+                "OpStore {0} %result",
+                in(reg) &mut result,
+                in(reg) self,
+                in(reg) &sampler,
+                in(reg) &coord
+            );
+            result
         }
     }
 
