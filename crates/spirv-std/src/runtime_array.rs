@@ -69,18 +69,24 @@ impl<T> RuntimeArray<T> {
     /// # Safety
     /// Bounds checking is not performed, and indexing outside the bounds of the array can happen,
     /// and lead to UB.
+    ///
     #[spirv_std_macros::gpu_only]
     pub unsafe fn index_nonuniform(&self, index: usize) -> &T {
         // FIXME(eddyb) `let mut result = T::default()` uses (for `asm!`), with this.
         // NOTE(siebencorgie): From what I understand we need to decorate the `index`, the `arr` as well as `result` and `result_slot` nonuniform.
         let mut result_slot = core::mem::MaybeUninit::uninit();
         asm! {
-            "OpDecorate {index} NonUniform",
-            "OpDecorate {arr} NonUniform",
+            "OpCapability ShaderNonUniform",
+            "OpCapability RuntimeDescriptorArray",
+            "OpCapability SampledImageArrayNonUniformIndexing",
+            "OpCapability StorageBufferArrayNonUniformIndexing",
+            "OpCapability StorageImageArrayNonUniformIndexing",
+            "OpExtension \"SPV_EXT_descriptor_indexing\"",
+            "OpSourceExtension \"GL_EXT_nonuniform_qualifier\"", //Not really needed
+            "OpDecorate %cpyidx NonUniform",
             "OpDecorate %result NonUniform",
-            "OpDecorate {result_slot} NonUniform",
-
-            "%result = OpAccessChain _ {arr} {index}",
+            "%cpyidx = OpCopyObject _ {index}",
+            "%result = OpAccessChain _  {arr} %cpyidx",
             "OpStore {result_slot} %result",
             arr = in(reg) self,
             index = in(reg) index,
