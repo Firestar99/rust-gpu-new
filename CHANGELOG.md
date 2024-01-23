@@ -37,6 +37,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - [PR#13](https://github.com/Rust-GPU/rust-gpu/pull/13) allow cargo features to be passed to the shader crate
 - [PR#12](https://github.com/rust-gpu/rust-gpu/pull/12) updated toolchain to `nightly-2024-04-24`
 - [PR#9](https://github.com/Rust-GPU/rust-gpu/pull/9) relaxed `glam` version requirements (`>=0.22, <=0.29`)
+- [PR#1118](https://github.com/EmbarkStudios/rust-gpu/pull/1118) update rspirv to 0.12
+    - `bary_coord_nv`/`bary_coord_no_persp_nv` have their `_nv` suffix omitted
 - [PR#1127](https://github.com/EmbarkStudios/rust-gpu/pull/1127) updated `spirv-tools` to `0.10.0`, which follows `vulkan-sdk-1.3.275`
 - [PR#1101](https://github.com/EmbarkStudios/rust-gpu/pull/1101) added `ignore` and `no_run` to documentation to make `cargo test` pass
 - [PR#1112](https://github.com/EmbarkStudios/rust-gpu/pull/1112) updated wgpu and winit in example runners
