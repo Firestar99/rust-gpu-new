@@ -2435,14 +2435,13 @@ dependencies = [
 [[package]]
 name = "spirt"
 version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "64e1f7903720ff818d6da824edf2c4082c6e7a029a99317fd10c39dd7c40c7ff"
+source = "git+https://github.com/Rust-GPU/spirt?rev=39140c7f74d4cf77412f619b3b74d3be236ee5d3#39140c7f74d4cf77412f619b3b74d3be236ee5d3"
 dependencies = [
  "arrayvec",
  "bytemuck",
  "derive_more",
  "elsa",
- "indexmap 1.9.3",
+ "indexmap 2.5.0",
  "internal-iterator",
  "itertools",
  "lazy_static",
