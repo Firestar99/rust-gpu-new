@@ -43,74 +43,120 @@ unsafe fn buffer_store_intrinsic<T>(
         .write(value);
 }
 
-/// `ByteAddressableBuffer` is an untyped blob of data, allowing loads and stores of arbitrary
-/// basic data types at arbitrary indices. However, all data must be aligned to size 4, each
-/// element within the data (e.g. struct fields) must have a size and alignment of a multiple of 4,
-/// and the `byte_index` passed to load and store must be a multiple of 4 (`byte_index` will be
-/// rounded down to the nearest multiple of 4). So, it's not technically a *byte* addressable
-/// buffer, but rather a *word* buffer, but this naming and behavior was inherited from HLSL (where
-/// it's UB to pass in an index not a multiple of 4).
+/// `ByteAddressableBuffer` is a view to an untyped blob of data, allowing
+/// loads and stores of arbitrary basic data types at arbitrary indices.
+///
+/// # Alignment
+/// All data must be aligned to size 4, each element within the data (e.g.
+/// struct fields) must have a size and alignment of a multiple of 4, and the
+/// `byte_index` passed to load and store must be a multiple of 4. Technically
+/// it is not a *byte* addressable buffer, but rather a *word* buffer, but this
+/// naming and behavior was inherited from HLSL (where it's UB to pass in an
+/// index not a multiple of 4).
+///
+/// # Safety
+/// Using these functions allows reading a different type from the buffer than
+/// was originally written (by a previous `store()` or the host API), allowing
+/// all sorts of safety guarantees to be bypassed, making it effectively a
+/// transmute.
 #[repr(transparent)]
-pub struct ByteAddressableBuffer<'a> {
+pub struct ByteAddressableBuffer<T> {
     /// The underlying array of bytes, able to be directly accessed.
-    pub data: &'a mut [u32],
+    pub data: T,
 }
 
-impl<'a> ByteAddressableBuffer<'a> {
+fn bounds_check<T>(data: &[u32], byte_index: u32) {
+    let sizeof = mem::size_of::<T>() as u32;
+    if byte_index % 4 != 0 {
+        panic!("`byte_index` should be a multiple of 4");
+    }
+    if byte_index + sizeof > data.len() as u32 {
+        let last_byte = byte_index + sizeof;
+        panic!(
+            "index out of bounds: the len is {} but loading {} bytes at `byte_index` {} reads until {} (exclusive)",
+            data.len(),
+            sizeof,
+            byte_index,
+            last_byte,
+        );
+    }
+}
+
+impl<'a> ByteAddressableBuffer<&'a [u32]> {
     /// Creates a `ByteAddressableBuffer` from the untyped blob of data.
     #[inline]
-    pub fn new(data: &'a mut [u32]) -> Self {
+    pub fn from_slice(data: &'a [u32]) -> Self {
         Self { data }
     }
 
-    /// Loads an arbitrary type from the buffer. `byte_index` must be a multiple of 4, otherwise,
-    /// it will get silently rounded down to the nearest multiple of 4.
+    /// Loads an arbitrary type from the buffer. `byte_index` must be a
+    /// multiple of 4.
     ///
     /// # Safety
-    /// This function allows writing a type to an untyped buffer, then reading a different type
-    /// from the same buffer, allowing all sorts of safety guarantees to be bypassed (effectively a
-    /// transmute)
+    /// See [`Self`].
     pub unsafe fn load<T>(&self, byte_index: u32) -> T {
-        if byte_index + mem::size_of::<T>() as u32 > self.data.len() as u32 {
-            panic!("Index out of range");
-        }
+        bounds_check::<T>(self.data, byte_index);
         buffer_load_intrinsic(self.data, byte_index)
     }
 
-    /// Loads an arbitrary type from the buffer. `byte_index` must be a multiple of 4, otherwise,
-    /// it will get silently rounded down to the nearest multiple of 4. Bounds checking is not
-    /// performed.
+    /// Loads an arbitrary type from the buffer. `byte_index` must be a
+    /// multiple of 4.
     ///
     /// # Safety
-    /// This function allows writing a type to an untyped buffer, then reading a different type
-    /// from the same buffer, allowing all sorts of safety guarantees to be bypassed (effectively a
-    /// transmute). Additionally, bounds checking is not performed.
+    /// See [`Self`]. Additionally, bounds or alignment checking is not performed.
     pub unsafe fn load_unchecked<T>(&self, byte_index: u32) -> T {
         buffer_load_intrinsic(self.data, byte_index)
     }
+}
 
-    /// Stores an arbitrary type int the buffer. `byte_index` must be a multiple of 4, otherwise,
-    /// it will get silently rounded down to the nearest multiple of 4.
+impl<'a> ByteAddressableBuffer<&'a mut [u32]> {
+    /// Creates a `ByteAddressableBuffer` from the untyped blob of data.
+    #[inline]
+    pub fn from_mut_slice(data: &'a mut [u32]) -> Self {
+        Self { data }
+    }
+
+    /// Create a non-mutable `ByteAddressableBuffer` from this mutable one.
+    #[inline]
+    pub fn as_ref(&self) -> ByteAddressableBuffer<&[u32]> {
+        ByteAddressableBuffer { data: self.data }
+    }
+
+    /// Loads an arbitrary type from the buffer. `byte_index` must be a
+    /// multiple of 4.
     ///
     /// # Safety
-    /// This function allows writing a type to an untyped buffer, then reading a different type
-    /// from the same buffer, allowing all sorts of safety guarantees to be bypassed (effectively a
-    /// transmute)
+    /// See [`Self`].
+    #[inline]
+    pub unsafe fn load<T>(&self, byte_index: u32) -> T {
+        self.as_ref().load(byte_index)
+    }
+
+    /// Loads an arbitrary type from the buffer. `byte_index` must be a
+    /// multiple of 4.
+    ///
+    /// # Safety
+    /// See [`Self`]. Additionally, bounds or alignment checking is not performed.
+    #[inline]
+    pub unsafe fn load_unchecked<T>(&self, byte_index: u32) -> T {
+        self.as_ref().load_unchecked(byte_index)
+    }
+
+    /// Stores an arbitrary type into the buffer. `byte_index` must be a
+    /// multiple of 4.
+    ///
+    /// # Safety
+    /// See [`Self`].
     pub unsafe fn store<T>(&mut self, byte_index: u32, value: T) {
-        if byte_index + mem::size_of::<T>() as u32 > self.data.len() as u32 {
-            panic!("Index out of range");
-        }
+        bounds_check::<T>(self.data, byte_index);
         buffer_store_intrinsic(self.data, byte_index, value);
     }
 
-    /// Stores an arbitrary type int the buffer. `byte_index` must be a multiple of 4, otherwise,
-    /// it will get silently rounded down to the nearest multiple of 4. Bounds checking is not
-    /// performed.
+    /// Stores an arbitrary type into the buffer. `byte_index` must be a
+    /// multiple of 4.
     ///
     /// # Safety
-    /// This function allows writing a type to an untyped buffer, then reading a different type
-    /// from the same buffer, allowing all sorts of safety guarantees to be bypassed (effectively a
-    /// transmute). Additionally, bounds checking is not performed.
+    /// See [`Self`]. Additionally, bounds or alignment checking is not performed.
     pub unsafe fn store_unchecked<T>(&mut self, byte_index: u32, value: T) {
         buffer_store_intrinsic(self.data, byte_index, value);
     }
