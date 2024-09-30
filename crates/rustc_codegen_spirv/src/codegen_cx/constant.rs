@@ -353,7 +353,7 @@ impl<'tcx> ConstMethods<'tcx> for CodegenCx<'tcx> {
                     self.tcx
                         .dcx()
                         .fatal("Non-zero scalar_to_backend ptr.offset not supported")
-                    // let offset = self.constant_u64(ptr.offset.bytes());
+                    // let offset = self.constant_bit64(ptr.offset.bytes());
                     // self.gep(base_addr, once(offset))
                 };
                 if let Primitive::Pointer(_) = layout.primitive() {
