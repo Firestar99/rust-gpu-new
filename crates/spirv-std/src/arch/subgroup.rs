@@ -794,7 +794,7 @@ macro_rules! macro_subgroup_op_clustered {
 }
 
 // add
-macro_subgroup_op!(impl Integer, "OpGroupNonUniformIAdd", subgroup_i_add, GroupOperation::Reduce, subgroup_inclusive_i_add, GroupOperation::InclusiveScan, subgroup_exclusive_i_add, GroupOperation::ExclusiveScan; r"
+macro_subgroup_op!(impl Integer, "OpGroupNonUniformIAdd", subgroup_add_i, GroupOperation::Reduce, subgroup_inclusive_add_i, GroupOperation::InclusiveScan, subgroup_exclusive_add_i, GroupOperation::ExclusiveScan; r"
 An integer add group operation of all Value operands contributed by active invocations in the group.
 
 Result Type must be a scalar or vector of integer type.
@@ -807,7 +807,7 @@ The type of Value must be the same as Result Type.
 
 Requires Capability `GroupNonUniformArithmetic`.
 ");
-macro_subgroup_op_clustered!(impl Integer, "OpGroupNonUniformIAdd", subgroup_clustered_i_add; r"
+macro_subgroup_op_clustered!(impl Integer, "OpGroupNonUniformIAdd", subgroup_clustered_add_i; r"
 An integer add group operation of all Value operands contributed by active invocations in the group.
 
 Result Type must be a scalar or vector of integer type.
@@ -822,7 +822,7 @@ ClusterSize is the size of cluster to use. ClusterSize must be a scalar of integ
 
 Requires Capability `GroupNonUniformArithmetic` and `GroupNonUniformClustered`.
 ");
-macro_subgroup_op!(impl Float, "OpGroupNonUniformFAdd", subgroup_f_add, GroupOperation::Reduce, subgroup_inclusive_f_add, GroupOperation::InclusiveScan, subgroup_exclusive_f_add, GroupOperation::ExclusiveScan; r"
+macro_subgroup_op!(impl Float, "OpGroupNonUniformFAdd", subgroup_add_f, GroupOperation::Reduce, subgroup_inclusive_add_f, GroupOperation::InclusiveScan, subgroup_exclusive_add_f, GroupOperation::ExclusiveScan; r"
 A floating point add group operation of all Value operands contributed by active invocations in the group.
 
 Result Type must be a scalar or vector of floating-point type.
@@ -835,7 +835,7 @@ The type of Value must be the same as Result Type. The method used to perform th
 
 Requires Capability `GroupNonUniformArithmetic`.
 ");
-macro_subgroup_op_clustered!(impl Float, "OpGroupNonUniformFAdd", subgroup_clustered_f_add; r"
+macro_subgroup_op_clustered!(impl Float, "OpGroupNonUniformFAdd", subgroup_clustered_add_f; r"
 A floating point add group operation of all Value operands contributed by active invocations in the group.
 
 Result Type must be a scalar or vector of floating-point type.
@@ -852,7 +852,7 @@ Requires Capability `GroupNonUniformArithmetic` and `GroupNonUniformClustered`.
 ");
 
 // mul
-macro_subgroup_op!(impl Integer, "OpGroupNonUniformIMul", subgroup_i_mul, GroupOperation::Reduce, subgroup_inclusive_i_mul, GroupOperation::InclusiveScan, subgroup_exclusive_i_mul, GroupOperation::ExclusiveScan; r"
+macro_subgroup_op!(impl Integer, "OpGroupNonUniformIMul", subgroup_mul_i, GroupOperation::Reduce, subgroup_inclusive_mul_i, GroupOperation::InclusiveScan, subgroup_exclusive_mul_i, GroupOperation::ExclusiveScan; r"
 An integer multiply group operation of all Value operands contributed by active invocations in the group.
 
 Result Type must be a scalar or vector of integer type.
@@ -865,7 +865,7 @@ The type of Value must be the same as Result Type.
 
 Requires Capability `GroupNonUniformArithmetic`.
 ");
-macro_subgroup_op_clustered!(impl Integer, "OpGroupNonUniformIMul", subgroup_clustered_i_mul; r"
+macro_subgroup_op_clustered!(impl Integer, "OpGroupNonUniformIMul", subgroup_clustered_mul_i; r"
 An integer multiply group operation of all Value operands contributed by active invocations in the group.
 
 Result Type must be a scalar or vector of integer type.
@@ -880,7 +880,7 @@ ClusterSize is the size of cluster to use. ClusterSize must be a scalar of integ
 
 Requires Capability `GroupNonUniformArithmetic` and `GroupNonUniformClustered`.
 ");
-macro_subgroup_op!(impl Float, "OpGroupNonUniformFMul", subgroup_f_mul, GroupOperation::Reduce, subgroup_inclusive_f_mul, GroupOperation::InclusiveScan, subgroup_exclusive_f_mul, GroupOperation::ExclusiveScan; r"
+macro_subgroup_op!(impl Float, "OpGroupNonUniformFMul", subgroup_mul_f, GroupOperation::Reduce, subgroup_inclusive_mul_f, GroupOperation::InclusiveScan, subgroup_exclusive_mul_f, GroupOperation::ExclusiveScan; r"
 A floating point multiply group operation of all Value operands contributed by active invocations in the group.
 
 Result Type must be a scalar or vector of floating-point type.
@@ -893,7 +893,7 @@ The type of Value must be the same as Result Type. The method used to perform th
 
 Requires Capability `GroupNonUniformArithmetic`.
 ");
-macro_subgroup_op_clustered!(impl Float, "OpGroupNonUniformFMul", subgroup_clustered_f_mul; r"
+macro_subgroup_op_clustered!(impl Float, "OpGroupNonUniformFMul", subgroup_clustered_mul_f; r"
 A floating point multiply group operation of all Value operands contributed by active invocations in the group.
 
 Result Type must be a scalar or vector of floating-point type.
@@ -910,7 +910,7 @@ Requires Capability `GroupNonUniformArithmetic` and `GroupNonUniformClustered`.
 ");
 
 // min
-macro_subgroup_op!(impl SignedInteger, "OpGroupNonUniformSMin", subgroup_s_min, GroupOperation::Reduce, subgroup_inclusive_s_min, GroupOperation::InclusiveScan, subgroup_exclusive_s_min, GroupOperation::ExclusiveScan; r"
+macro_subgroup_op!(impl SignedInteger, "OpGroupNonUniformSMin", subgroup_min_s, GroupOperation::Reduce, subgroup_inclusive_min_s, GroupOperation::InclusiveScan, subgroup_exclusive_min_s, GroupOperation::ExclusiveScan; r"
 A signed integer minimum group operation of all Value operands contributed by active invocations in the group.
 
 Result Type must be a scalar or vector of integer type.
@@ -923,7 +923,7 @@ The type of Value must be the same as Result Type.
 
 Requires Capability `GroupNonUniformArithmetic`.
 ");
-macro_subgroup_op_clustered!(impl SignedInteger, "OpGroupNonUniformSMin", subgroup_clustered_s_min; r"
+macro_subgroup_op_clustered!(impl SignedInteger, "OpGroupNonUniformSMin", subgroup_clustered_min_s; r"
 A signed integer minimum group operation of all Value operands contributed by active invocations in the group.
 
 Result Type must be a scalar or vector of integer type.
@@ -938,7 +938,7 @@ ClusterSize is the size of cluster to use. ClusterSize must be a scalar of integ
 
 Requires Capability `GroupNonUniformArithmetic` and `GroupNonUniformClustered`.
 ");
-macro_subgroup_op!(impl UnsignedInteger, "OpGroupNonUniformUMin", subgroup_u_min, GroupOperation::Reduce, subgroup_inclusive_u_min, GroupOperation::InclusiveScan, subgroup_exclusive_u_min, GroupOperation::ExclusiveScan; r"
+macro_subgroup_op!(impl UnsignedInteger, "OpGroupNonUniformUMin", subgroup_min_u, GroupOperation::Reduce, subgroup_inclusive_min_u, GroupOperation::InclusiveScan, subgroup_exclusive_min_u, GroupOperation::ExclusiveScan; r"
 An unsigned integer minimum group operation of all Value operands contributed by active invocations in the group.
 
 Result Type must be a scalar or vector of integer type, whose Signedness operand is 0.
@@ -951,7 +951,7 @@ The type of Value must be the same as Result Type.
 
 Requires Capability `GroupNonUniformArithmetic`.
 ");
-macro_subgroup_op_clustered!(impl UnsignedInteger, "OpGroupNonUniformUMin", subgroup_clustered_u_min; r"
+macro_subgroup_op_clustered!(impl UnsignedInteger, "OpGroupNonUniformUMin", subgroup_clustered_min_u; r"
 An unsigned integer minimum group operation of all Value operands contributed by active invocations in the group.
 
 Result Type must be a scalar or vector of integer type, whose Signedness operand is 0.
@@ -966,7 +966,7 @@ ClusterSize is the size of cluster to use. ClusterSize must be a scalar of integ
 
 Requires Capability `GroupNonUniformArithmetic` and `GroupNonUniformClustered`.
 ");
-macro_subgroup_op!(impl Float, "OpGroupNonUniformFMin", subgroup_f_min, GroupOperation::Reduce, subgroup_inclusive_f_min, GroupOperation::InclusiveScan, subgroup_exclusive_f_min, GroupOperation::ExclusiveScan; r"
+macro_subgroup_op!(impl Float, "OpGroupNonUniformFMin", subgroup_min_f, GroupOperation::Reduce, subgroup_inclusive_min_f, GroupOperation::InclusiveScan, subgroup_exclusive_min_f, GroupOperation::ExclusiveScan; r"
 A floating point minimum group operation of all Value operands contributed by active invocations in the group.
 
 Result Type must be a scalar or vector of floating-point type.
@@ -979,7 +979,7 @@ The type of Value must be the same as Result Type. The method used to perform th
 
 Requires Capability `GroupNonUniformArithmetic`.
 ");
-macro_subgroup_op_clustered!(impl Float, "OpGroupNonUniformFMin", subgroup_clustered_f_min; r"
+macro_subgroup_op_clustered!(impl Float, "OpGroupNonUniformFMin", subgroup_clustered_min_f; r"
 A floating point minimum group operation of all Value operands contributed by active invocations in the group.
 
 Result Type must be a scalar or vector of floating-point type.
@@ -996,7 +996,7 @@ Requires Capability `GroupNonUniformArithmetic` and `GroupNonUniformClustered`.
 ");
 
 // max
-macro_subgroup_op!(impl SignedInteger, "OpGroupNonUniformSMax", subgroup_s_max, GroupOperation::Reduce, subgroup_inclusive_s_max, GroupOperation::InclusiveScan, subgroup_exclusive_s_max, GroupOperation::ExclusiveScan; r"
+macro_subgroup_op!(impl SignedInteger, "OpGroupNonUniformSMax", subgroup_max_s, GroupOperation::Reduce, subgroup_inclusive_max_s, GroupOperation::InclusiveScan, subgroup_exclusive_max_s, GroupOperation::ExclusiveScan; r"
 A signed integer maximum group operation of all Value operands contributed by active invocations in the group.
 
 Result Type must be a scalar or vector of integer type.
@@ -1009,7 +1009,7 @@ The type of Value must be the same as Result Type.
 
 Requires Capability `GroupNonUniformArithmetic`.
 ");
-macro_subgroup_op_clustered!(impl SignedInteger, "OpGroupNonUniformSMax", subgroup_clustered_s_max; r"
+macro_subgroup_op_clustered!(impl SignedInteger, "OpGroupNonUniformSMax", subgroup_clustered_max_s; r"
 A signed integer maximum group operation of all Value operands contributed by active invocations in the group.
 
 Result Type must be a scalar or vector of integer type.
@@ -1024,7 +1024,7 @@ ClusterSize is the size of cluster to use. ClusterSize must be a scalar of integ
 
 Requires Capability `GroupNonUniformArithmetic` and `GroupNonUniformClustered`.
 ");
-macro_subgroup_op!(impl UnsignedInteger, "OpGroupNonUniformUMax", subgroup_u_max, GroupOperation::Reduce, subgroup_inclusive_u_max, GroupOperation::InclusiveScan, subgroup_exclusive_u_max, GroupOperation::ExclusiveScan; r"
+macro_subgroup_op!(impl UnsignedInteger, "OpGroupNonUniformUMax", subgroup_max_u, GroupOperation::Reduce, subgroup_inclusive_max_u, GroupOperation::InclusiveScan, subgroup_exclusive_max_u, GroupOperation::ExclusiveScan; r"
 An unsigned integer maximum group operation of all Value operands contributed by active invocations in the group.
 
 Result Type must be a scalar or vector of integer type, whose Signedness operand is 0.
@@ -1037,7 +1037,7 @@ The type of Value must be the same as Result Type.
 
 Requires Capability `GroupNonUniformArithmetic`.
 ");
-macro_subgroup_op_clustered!(impl UnsignedInteger, "OpGroupNonUniformUMax", subgroup_clustered_u_max; r"
+macro_subgroup_op_clustered!(impl UnsignedInteger, "OpGroupNonUniformUMax", subgroup_clustered_max_u; r"
 An unsigned integer maximum group operation of all Value operands contributed by active invocations in the group.
 
 Result Type must be a scalar or vector of integer type, whose Signedness operand is 0.
@@ -1052,7 +1052,7 @@ ClusterSize is the size of cluster to use. ClusterSize must be a scalar of integ
 
 Requires Capability `GroupNonUniformArithmetic` and `GroupNonUniformClustered`.
 ");
-macro_subgroup_op!(impl Float, "OpGroupNonUniformFMax", subgroup_f_max, GroupOperation::Reduce, subgroup_inclusive_f_max, GroupOperation::InclusiveScan, subgroup_exclusive_f_max, GroupOperation::ExclusiveScan; r"
+macro_subgroup_op!(impl Float, "OpGroupNonUniformFMax", subgroup_max_f, GroupOperation::Reduce, subgroup_inclusive_max_f, GroupOperation::InclusiveScan, subgroup_exclusive_max_f, GroupOperation::ExclusiveScan; r"
 A floating point maximum group operation of all Value operands contributed by active invocations in by group.
 
 Result Type must be a scalar or vector of floating-point type.
@@ -1065,7 +1065,7 @@ The type of Value must be the same as Result Type. The method used to perform th
 
 Requires Capability `GroupNonUniformArithmetic`.
 ");
-macro_subgroup_op_clustered!(impl Float, "OpGroupNonUniformFMax", subgroup_clustered_f_max; r"
+macro_subgroup_op_clustered!(impl Float, "OpGroupNonUniformFMax", subgroup_clustered_max_f; r"
 A floating point maximum group operation of all Value operands contributed by active invocations in by group.
 
 Result Type must be a scalar or vector of floating-point type.
