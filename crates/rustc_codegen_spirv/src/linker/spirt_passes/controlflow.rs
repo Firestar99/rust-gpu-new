@@ -364,7 +364,7 @@ pub fn convert_custom_aborts_to_unstructured_returns_in_entry_points(
                         };
 
                         // HACK(eddyb) this improves readability w/ very verbose Vulkan loggers.
-                        fmt += "\n";
+                        fmt += "\\n";
 
                         fmt += "[Rust ";
 
@@ -383,23 +383,23 @@ pub fn convert_custom_aborts_to_unstructured_returns_in_entry_points(
                             fmt += &fmt_dbg_src_loc(loc);
                         }
 
-                        fmt += "]\n ";
-                        fmt += &message_debug_printf_fmt_str.replace('\n', "\n ");
+                        fmt += "]\\n ";
+                        fmt += &message_debug_printf_fmt_str.replace('\n', "\\n ");
 
                         let mut innermost = true;
                         let mut append_call = |callsite_debug_src_loc, callee: &str| {
                             if innermost {
                                 innermost = false;
-                                fmt += "\n      in ";
+                                fmt += "\\n      in ";
                             } else if current_debug_src_loc.is_some() {
-                                fmt += "\n      by ";
+                                fmt += "\\n      by ";
                             } else {
                                 // HACK(eddyb) previous call didn't have a `called at` line.
-                                fmt += "\n      called by ";
+                                fmt += "\\n      called by ";
                             }
                             fmt += callee;
                             if let Some(loc) = callsite_debug_src_loc {
-                                fmt += "\n        called at ";
+                                fmt += "\\n        called at ";
                                 fmt += &fmt_dbg_src_loc(loc);
                             }
                             current_debug_src_loc = callsite_debug_src_loc;
@@ -409,7 +409,7 @@ pub fn convert_custom_aborts_to_unstructured_returns_in_entry_points(
                         }
                         append_call(None, &debug_printf_context_fmt_str);
 
-                        fmt += "\n";
+                        fmt += "\\n";
 
                         let abort_inst_def = &mut func_def_body.data_insts[abort_inst];
                         abort_inst_def.form = cx.intern(DataInstFormDef {
